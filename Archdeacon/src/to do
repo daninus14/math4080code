@@ -1,0 +1,75 @@
+embeddingTest in archdeacon.py never returns true! edit this!
+check in embedding test whether planarityTest3 returns false!
+
+
+
+Write a V8 Class
+=============
+branch vertices v[1] = vertex
+"edges"-paths v[(1,3)] = path
+getEmbeddings returns all possible embeddings
+getEmbedding(integer bvetween one and five, for a specific embedding)
+maybe have a current embedding...or embeddings left
+
+-------------------------
+
+
+
+get All Possible Obstructions to a graph (graph, embedding, V8, which embedding of V8)
+============
+
+getJumps
+===
+
+
+
+--------------------------------
+
+loop
+=========
+for each { graph, v8, # }:
+if findEmbedding != false: add obstructions({ graph, v8, # }, embedding)
+else: add graph to final list (database, or save file)
+
+
+
+
+--------------------------------
+findEmbedding(graph, v8, number of embedding)
+====================================
+while embedding = false:
+if embedingTest2(graph, v8, v8.getEmbedding(i)): return embedding
+i++
+
+
+
+
+======
+MAIN SCRIPT!
+
+GraphList
+NoEmbedList
+
+List of potential graphs that have an underlying V8 that have an embedding in the projective plane. The list just starts with V8, and we will add obstructions and find re-embeddings to the new graphs with obstructions, and add them to the list. If one of the graphs does not embed in the projective plane, add it to the NoEmbedList.
+
+for each { graph, v8, # }:
+FOR EACH GRAPH IN GraphList we keep the graph, the underlying V8 subdivision for that graph, and the lowest index of a possible embedding (there are 5 embedding for a V8). We keep all of this information as a V8graph object (instance of a class, abstract and encapsulate functionality).
+
+{ // inside of the loop for each...
+If there is a possible embedding for the current graph in the projective plane, then we add an obstruction.
+Otherwise, if there is no possible embedding for the graph, add it to the NoEmbedList
+
+remove graph from the list since it has already been evaluated and it was either modified and inserted again, or added to NoEmbedList. We probably added many new graphs to the list, one for each possible obstrcution.
+
+// We continue running this until the list is empty
+//Add obstruction calls
+
+}
+if findEmbedding != false: add obstructions({ graph, v8, # }, embedding)
+else: add graph to final list (database, or save file)
+
+
+
+
+
+

@@ -1,0 +1,35 @@
+python archdeacon.py ../graphs/b7 ../graphs/b7-v8 ../graphs/b7-v8-faces
+
+python archdeacon.py ../graphs/b7-v8 ../graphs/b7-v8 ../graphs/b7-v8-faces 
+
+python archdeacon.py ../graphs/b7-planar ../graphs/b7-v8 ../graphs/b7-v8-faces 
+
+python archdeacon.py ../graphs/b7-files/b7-planar1 ../graphs/b7-files/b7-v8-planar1 ../graphs/b7-files/b7-v8-faces-planar1 
+
+python archdeacon.py ../graphs/b7-files/b7-planar2 ../graphs/b7-files/b7-v8-planar2 ../graphs/b7-files/b7-v8-faces-planar2 
+
+
+
+d2-files
+============
+python archdeacon.py ../graphs/d2-files/planar1 ../graphs/d2-files/v8-planar1 ../graphs/d2-files/v8-faces1-planar1 
+python archdeacon.py ../graphs/d2-files/planar1 ../graphs/d2-files/v8-planar1 ../graphs/d2-files/v8-faces2-planar1 
+python archdeacon.py ../graphs/d2-files/planar1 ../graphs/d2-files/v8-planar1 ../graphs/d2-files/v8-faces3-planar1 
+python archdeacon.py ../graphs/d2-files/planar1 ../graphs/d2-files/v8-planar1 ../graphs/d2-files/v8-faces4-planar1 
+python archdeacon.py ../graphs/d2-files/planar1 ../graphs/d2-files/v8-planar1 ../graphs/d2-files/v8-faces5-planar1
+
+
+
+
+stage 1
+=========
+
+
+stage 2
+=========
+python archdeacon.py -et ../graphs/d2-files/planar1 ../graphs/d2-files/v8-planar1 ../graphs/d2-files/v8-faces5-planar1
+
+stage 3
+=========
+
+

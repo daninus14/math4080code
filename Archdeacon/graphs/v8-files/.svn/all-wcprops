@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/17/trunk/Archdeacon/graphs/v8-files
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/17/trunk/Archdeacon/graphs/v8-files/README
+END
+v8-edges
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/17/trunk/Archdeacon/graphs/v8-files/v8-edges
+END
+v8-possible-faces
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/17/trunk/Archdeacon/graphs/v8-files/v8-possible-faces
+END
