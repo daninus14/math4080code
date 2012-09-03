@@ -9,28 +9,6 @@ __author__="Daniel Nussenbaum"
 __date__ ="$Feb 29, 2012 11:15:32 AM$"
 __all__ = ["generateAllNonProjectivePlanarGraphs"]
 
-def main():
-
-    t0 = time()
-    if sys.argv[1] == "-et":
-        et(sys.argv[2], sys.argv[3], sys.argv[4])
-    elif sys.argv[1] == '-gNPP': #Generate Non-Projective Planar (gNPP) graphs
-        keepWork = False
-        output = False
-        if len(sys.argv) > 2:
-            for condition in sys.argv[2:]:
-                if condition == '-output':
-                    output = True
-                elif condition == '-keepWork':
-                    keepWork = True
-        generateAllNonProjectivePlanarGraphs(output, keepWork)
-    elif sys.argv[1] == '-test':
-        if sys.argv[2] == '-gNPP':
-            print 'FIGURE OUT HOW TO CALL A TEST!'
-    else: print sys.argv
-    t1 = time()
-    print "Total Time: " + str(t1-t0)
-
 ## STAGE 3 ALGORITHMS
 
 def generateAllNonProjectivePlanarGraphs(output=False, keepWork=False):
@@ -78,7 +56,7 @@ def generateAllNonProjectivePlanarGraphs(output=False, keepWork=False):
                 print dirOutput + "list-" + str(counter % 1000)
         currGraph = listCurrGraphs[0]
         listCurrGraphs = listCurrGraphs[1:]
-        listCurrGraphsLabels = listCurrGraphsLabels[1:]
+        # listCurrGraphsLabels = listCurrGraphsLabels[1:]
         if len(listCurrGraphs) > currNum:
             print "len is over " + str(currNum)
             currNum *= orderMagnitude

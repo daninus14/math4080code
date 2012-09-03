@@ -7,7 +7,9 @@ __date__ ="$Sep 02, 2012 04:15:32 PM$"
 def main():
 
     t0 = time()
-    if sys.argv[1] == "-et":
+    if len(sys.argv) == 1 || sys.argv[1] == "--help":
+        print "Help (winter) is coming...." 
+    elif sys.argv[1] == "-et":
         et(sys.argv[2], sys.argv[3], sys.argv[4])
     elif sys.argv[1] == '-gNPP': #Generate Non-Projective Planar (gNPP) graphs
         keepWork = False
