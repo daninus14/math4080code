@@ -7,6 +7,7 @@ from time import time
 import os
 __author__="Daniel Nussenbaum"
 __date__ ="$Feb 29, 2012 11:15:32 AM$"
+__all__ = ["generateAllNonProjectivePlanarGraphs"]
 
 def main():
 
@@ -34,17 +35,19 @@ def main():
 
 def generateAllNonProjectivePlanarGraphs(output=False, keepWork=False):
     v8 = GraphWithV8.fromfilename() # This is the original V8 graph we start with
-    list = [v8] # This is a list of graphs
+    listCurrGraphs = [v8] # This is a list of graphs
+    listCurrGraphsLabels = [] # This is a list of the canonical labels of the curent graphs
+    lisNPPGLabels = []
 #    noEmbedList = []
 
     fileNumber = 1
     if output:
-        dir = os.getcwd()
-        folders = dir.split('/')
-        dir = dir.strip(folders[-1])
-        if not os.path.exists(dir + "output/"):
-            os.makedirs(dir + "output/")
-        dir = dir + "output/"
+        dirOutput = os.getcwd()
+        folders = dirOutput.split('/')
+        dirOutput = dirOutput.strip(folders[-1])
+        if not os.path.exists(dirOutput + "output/"):
+            os.makedirs(dirOutput + "output/")
+        dirOutput = dirOutput + "output/"
     if keepWork:
         dirInput = os.getcwd()
         foldersInput = dirInput.split('/')
@@ -59,23 +62,24 @@ def generateAllNonProjectivePlanarGraphs(output=False, keepWork=False):
     print "t0: " + str(t0)
     counter = 0
 
-    while len(list) > 0:
+    while len(listCurrGraphs) > 0:
         counter += 1
         if counter % 10 == 0:
             t1 = time()
             print "Loop has run " + str(counter) + " times in " + str(t1-t0) + " time"
             if keepWork:
                 file = open(dirInput + "list-" + str(counter % 1000), "w")
-                for i in range(len(list)):
-                    inputGraph = list[i]
+                for i in range(len(listCurrGraphs)):
+                    inputGraph = listCurrGraphs[i]
                     file.write("Graph " + str(i) + "\n" + inputGraph.toFileString() + "\n\n")
                 file.close()
 #                fileNumber += 1
                 print "file created!"
-                print dir + "list-" + str(counter % 1000)
-        currGraph = list[0]
-        list = list[1:]
-        if len(list) > currNum:
+                print dirOutput + "list-" + str(counter % 1000)
+        currGraph = listCurrGraphs[0]
+        listCurrGraphs = listCurrGraphs[1:]
+        listCurrGraphsLabels = listCurrGraphsLabels[1:]
+        if len(listCurrGraphs) > currNum:
             print "len is over " + str(currNum)
             currNum *= orderMagnitude
             t1 = time()
@@ -86,23 +90,31 @@ def generateAllNonProjectivePlanarGraphs(output=False, keepWork=False):
         currGraphObstructions = getGraphListWithObstructions(currGraph)
         
         if not currGraphObstructions:
-#            print "currGraph: " + currGraph.toString()
-#            print currGraph.getEmbedding()
-#            print currGraph.firstCurrentlyEmbedding
-#            noEmbedList.append(currGraph)
-            if output:
-                file = open(dir + "graph-" + str(fileNumber), "w")
-                file.write(currGraph.toFileString())
-                file.close()
-                print "file created!:     " + dir + "graph-" + str(fileNumber)
-                fileNumber += 1
+            currGraphLabel = currGraph.getCanonicalLabel()
+            for nppgLabel in lisNPPGLabels:
+                if nppgLabel == currGraphLabel:
+                    break
+            else:
+                lisNPPGLabels.append(currGraphLabel)
+
+                if output:
+                    file = open(dirOutput + "graph-" + str(fileNumber), "w")
+                    file.write(currGraph.toFileString())
+                    file.close()
+                    print "file created!:     " + dirOutput + "graph-" + str(fileNumber)
+                    fileNumber += 1
 
         else:
-            list += currGraphObstructions
-#            print "currGraphObstructions: " + str(currGraphObstructions)
-#    for graph in noEmbedList:
-#        print "\n\nNo Embed Graph: " + graph.toString()
-#    return noEmbedList
+            # listCurrGraphs += currGraphObstructions
+            for currGraphObstruction in currGraphObstructions:
+                currGraphObstructionLabel = currGraphObstruction.getCanonicalLabel()
+                for currGraphLabel in listCurrGraphsLabels:
+                    if currGraphLabel == currGraphObstructionLabel:
+                        break
+                else:
+                    listCurrGraphs.append(currGraphObstruction)
+                    listCurrGraphsLabels.append(currGraphObstruction.getCanonicalLabel())
+
 
 
 def getGraphListWithObstructions(graph):
@@ -127,24 +139,30 @@ def findJumps(graph, embedding):
     THIS RETURNS A LIST OF NEW GRAPHS WITH JUMPS. EACH ONE A NEW JUMP
     """
     #check with stage2EmbeddingTest whether current graph embedds in firstCurrentlyEmbedding
-#    print graph.toString()
-#    print embedding
     vertices = graph.getVertices()
     vertexFaces = getVertexFaces(vertices, embedding)
     vertexJumps = findVertexJumps(graph, vertices, vertexFaces)
-#    print "vertexJumps: " + str(vertexJumps)
     edges = graph.getEdges()
     edgeFaces = getEdgeFaces(edges, embedding)
     edgeJumps = findEdgeJumps(graph, edges, edgeFaces, embedding)
     vertexEdgeJumps = findVertexEdgeJumps(graph, vertices, vertexFaces, edges, edgeFaces)
+
+    nonIsomorphicJumps = []
+    nonIsomorphicJumpLabels = []
+    for currGraph in vertexJumps + vertexEdgeJumps + edgeJumps:
+        currGraphLabel = currGraph.getCanonicalLabel()
+        for currNonIsomorphicGraphLabel in nonIsomorphicJumpLabels:
+            if currNonIsomorphicGraphLabel == currGraphLabel:
+                break
+        else:
+            nonIsomorphicJumps.append(currGraph)
+            nonIsomorphicJumpLabels.append(currGraph.getCanonicalLabel())
     
-
-
-    return vertexJumps + vertexEdgeJumps + edgeJumps
+    return nonIsomorphicJumps
 
 def findVertexEdgeJumps(graph, vertices, vertexFaces, edges, edgeFaces):
-#    print 'a'
     vertexEdgeJumps = []
+    vertexEdgeJumpLabels = []
     for e in edges:
         for v in vertices:
             coFacial = False
@@ -155,21 +173,19 @@ def findVertexEdgeJumps(graph, vertices, vertexFaces, edges, edgeFaces):
                 currGraph = graph.clone()
                 v0 = currGraph.addVertexInEdge(e)
                 currGraph.addEdge(v0, v)
-#                vertexEdgeJumps.append(currGraph)
-                for currJump in vertexEdgeJumps:
-                   if(checkGraphIsomorphism(currJump.getGraph(), currGraph.getGraph())):
-                    # testing SAGE
-                    if currJump.getCanonicalLabel() != currGraph.getCanonicalLabel():
-                        print "Houston we have a problem!"
-                        # testing SAGE
-                    break
+                currGraphLabel = currGraph.getCanonicalLabel()
+                for currJumpLabel in vertexEdgeJumpLabels:
+                    if currJumpLabel == currGraphLabel:
+                        break
                 else:
                     vertexEdgeJumps.append(currGraph)
+                    vertexEdgeJumpLabels.append(currGraph.getCanonicalLabel())
     return vertexEdgeJumps
 
 def findEdgeJumps(graph, edges, edgeFaces, embedding):
     nonCofacial = []
     edgeJumps = []
+    edgeJumpLabels = []
     for e in edges:
         for ei in edges[edges.index(e):]:
             cofacial = False
@@ -195,21 +211,13 @@ def findEdgeJumps(graph, edges, edgeFaces, embedding):
         v0 = currGraph.addVertexInEdge(edgePair[0])
         v1 = currGraph.addVertexInEdge(edgePair[1])
         currGraph.addEdge(v0, v1)
-        for currJump in edgeJumps:
-#            print "currGraph: " + currGraph.toString()
-#            print "currJump: " + currJump.toString()
-#            print "ISOMORPHISM: " + str(checkGraphIsomorphism(currJump.getGraph(), currGraph.getGraph()))
-            # testing SAGE
-            labelEqual = True
-            if currJump.getCanonicalLabel() != currGraph.getCanonicalLabel():
-                labelEqual = False
-                # testing SAGE
-            if(checkGraphIsomorphism(currJump.getGraph(), currGraph.getGraph())):
-                if labelEqual == False:
-                    print "Houston we have a problem!"
+        currGraphLabel = currGraph.getCanonicalLabel()
+        for currJumpLabel in edgeJumpLabels:
+            if currJumpLabel == currGraphLabel:
                 break
         else:
             edgeJumps.append(currGraph)
+            edgeJumpLabels.append(currGraph.getCanonicalLabel())
 
     return edgeJumps
 
@@ -242,6 +250,7 @@ def getVertexFaces(vertices, embedding):
 def findVertexJumps(graph, vertices, vertexFaces):
     nonCofacial = []
     vertexJumps = []
+    vertexJumpLabels = []
     for v in vertices:
         for vi in vertices[vertices.index(v):]:
             cofacial = False
@@ -250,20 +259,16 @@ def findVertexJumps(graph, vertices, vertexFaces):
                     cofacial = True
             if not cofacial:
                 nonCofacial.append((v, vi))
-#                print "nonCofacial: " + str(nonCofacial)
     for edge in nonCofacial:
         currGraph = graph.clone()
         currGraph.addEdge(edge[0], edge[1])
-#        vertexJumps.append(currGraph)
-        for currJump in vertexJumps:
-           if(checkGraphIsomorphism(currJump.getGraph(), currGraph.getGraph())):
-            # testing SAGE
-                if currJump.getCanonicalLabel() != currGraph.getCanonicalLabel():
-                    print "Houston we have a problem!"
-                    # testing SAGE
+        currGraphLabel = currGraph.getCanonicalLabel()
+        for currJumpLabel in vertexJumpLabels:
+            if currJumpLabel == currGraphLabel:
                 break
         else:
             vertexJumps.append(currGraph)
+            vertexJumpLabels.append(currGraph.getCanonicalLabel())
 
 
     return vertexJumps

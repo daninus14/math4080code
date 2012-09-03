@@ -67,3 +67,7 @@ pip-log.txt
 # Previous Version Control System #
 ####################################
 .svn 
+
+# Folders #
+###########
+Archdeacon/output/
