@@ -158,7 +158,11 @@ def findVertexEdgeJumps(graph, vertices, vertexFaces, edges, edgeFaces):
 #                vertexEdgeJumps.append(currGraph)
                 for currJump in vertexEdgeJumps:
                    if(checkGraphIsomorphism(currJump.getGraph(), currGraph.getGraph())):
-                        break
+                    # testing SAGE
+                    if currJump.getCanonicalLabel() != currGraph.getCanonicalLabel():
+                        print "Houston we have a problem!"
+                        # testing SAGE
+                    break
                 else:
                     vertexEdgeJumps.append(currGraph)
     return vertexEdgeJumps
@@ -195,11 +199,17 @@ def findEdgeJumps(graph, edges, edgeFaces, embedding):
 #            print "currGraph: " + currGraph.toString()
 #            print "currJump: " + currJump.toString()
 #            print "ISOMORPHISM: " + str(checkGraphIsomorphism(currJump.getGraph(), currGraph.getGraph()))
+            # testing SAGE
+            labelEqual = True
+            if currJump.getCanonicalLabel() != currGraph.getCanonicalLabel():
+                labelEqual = False
+                # testing SAGE
             if(checkGraphIsomorphism(currJump.getGraph(), currGraph.getGraph())):
+                if labelEqual == False:
+                    print "Houston we have a problem!"
                 break
         else:
             edgeJumps.append(currGraph)
-#        edgeJumps.append(currGraph)
 
     return edgeJumps
 
@@ -247,6 +257,10 @@ def findVertexJumps(graph, vertices, vertexFaces):
 #        vertexJumps.append(currGraph)
         for currJump in vertexJumps:
            if(checkGraphIsomorphism(currJump.getGraph(), currGraph.getGraph())):
+            # testing SAGE
+                if currJump.getCanonicalLabel() != currGraph.getCanonicalLabel():
+                    print "Houston we have a problem!"
+                    # testing SAGE
                 break
         else:
             vertexJumps.append(currGraph)

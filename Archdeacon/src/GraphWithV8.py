@@ -1,15 +1,20 @@
-import GraphWithV8
+#!/usr/bin/env sage -python
+import os
 from graphFunctions import getGraphFromEdgeTupleList
 from graphFunctions import cloneGraph
 from graphFunctions import cloneList
 from graphFunctions import *
 from graphFunctions import replaceEdgesWithPaths
 from stage2 import *
+
+from sage.all import *
+
 __author__="Daniel Nussenbaum"
 __date__ ="$Mar 30, 2012 3:49:46 PM$"
 
 class GraphWithV8:
     """V8 class implementation """
+    projectPath = "".join([ x + '/' for x in os.getcwd().split('/')[0:-1]])
     v8Vertices = []
     v8EdgePaths = {} # Key = Edge, Value = Path
     v8Embeddings = [] # List of Dictionaries?
@@ -31,7 +36,7 @@ class GraphWithV8:
 
 
     @classmethod
-    def fromfilename(cls, edges="/home/daniel/NetBeansProjects/Archdeacon/graphs/v8-files/v8-edges", embeddings="/home/daniel/NetBeansProjects/Archdeacon/graphs/v8-files/v8-possible-faces"):
+    def fromfilename(cls, edges=projectPath+"/graphs/v8-files/v8-edges", embeddings=projectPath+"/graphs/v8-files/v8-possible-faces"):
         edgeList = createEdgeList(edges)
         v8Embeddings = createEmbeddings(embeddings)
         return GraphWithV8.fromV8(edgeList, v8Embeddings)
@@ -120,6 +125,13 @@ class GraphWithV8:
 
     def getV8SubGraph():
             return getGraphFromEdgePaths(self.v8EdgePaths)
+
+    def getCanonicalLabel(self):
+        tempSageGraph = Graph()
+        tempSageGraph.add_vertices(self.graphVertices)
+        tempSageGraph.add_edges(self.graphEdgeList)
+        tempSageLabel = tempSageGraph.canonical_label()
+        return tempSageLabel.graph6_string()
 
     def addEdge(self, v0, v1):
         """
