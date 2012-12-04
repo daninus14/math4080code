@@ -68,6 +68,7 @@ static PyObject* gr(PyObject* self, PyObject* args)
     int i, len; 
     PyObject* item;
     long arrayValue;
+    int embedsBoolean;
 
     int numberOfVertices = 0;
 
@@ -163,11 +164,14 @@ static PyObject* gr(PyObject* self, PyObject* args)
                 default  : printf ("ERROR"); 
                 }
             puts (" embeddings");
+            embedsBoolean = 0;
             break;
         case 2: puts ( "graph is planar");
+            embedsBoolean = 1;
             break;
         case 1:
         case 3: puts ( "graph embeds"); 
+            embedsBoolean = 1;
             break;
         default: puts ( "whoops -- unknown result from gembed()");
             break;
@@ -178,6 +182,9 @@ static PyObject* gr(PyObject* self, PyObject* args)
     Py_DECREF(seq);
     printf("]\n");
     printf("Item is a list!\n");
+
+    if(embedsBoolean) Py_RETURN_TRUE;
+    else Py_RETURN_FALSE;
 
     Py_RETURN_NONE;
 }
