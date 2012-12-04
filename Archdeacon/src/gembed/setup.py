@@ -1,6 +1,6 @@
 from distutils.core import setup, Extension
 
-module1 = Extension("et", sources=["et.c", "gem.c", "gembed.c"])
+module1 = Extension("embeddingtest", sources=["embeddingtest.c", "gem.c", "gembed.c"])
 
 setup( name="PackageName",
 	version = "1.0",

@@ -54,7 +54,7 @@ static PyObject* tpp(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-static PyObject* gr(PyObject* self, PyObject* args)
+static PyObject* graph_embeds(PyObject* self, PyObject* args)
 {
 
     // Making Graphs
@@ -193,15 +193,15 @@ static PyMethodDef EmbedtestMethods[] =
 {
     {"tpp", tpp, METH_VARARGS, "Test whether a given graph is projective planar"},
     {"hello", hello, METH_VARARGS, "Test whether a given graph is projective planar"},
-	{"gr", gr, METH_VARARGS, "Test whether a given graph is projective planar"},
+	{"graph_embeds", graph_embeds, METH_VARARGS, "Test whether a given graph is projective planar"},
 	{NULL, NULL, 0, NULL}
 };
 
 PyMODINIT_FUNC
 
-initet(void)
+initembeddingtest(void)
 {
-	(void) Py_InitModule("et", EmbedtestMethods);
+	(void) Py_InitModule("embeddingtest", EmbedtestMethods);
 }
 
 
