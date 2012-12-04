@@ -1,3 +1,14 @@
+Sub graph isomorphism
+
+
+
+
+
+
+***************
+** OLD STUFF **
+***************
+
 embeddingTest in archdeacon.py never returns true! edit this!
 check in embedding test whether planarityTest3 returns false!
 

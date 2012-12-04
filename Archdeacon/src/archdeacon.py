@@ -15,7 +15,7 @@ def generateAllNonProjectivePlanarGraphs(output=False, keepWork=False):
     v8 = GraphWithV8.fromfilename() # This is the original V8 graph we start with
     listCurrGraphs = [v8] # This is a list of graphs
     listCurrGraphsLabels = [] # This is a list of the canonical labels of the curent graphs
-    lisNPPGLabels = []
+    listNPPGLabels = []
 #    noEmbedList = []
 
     fileNumber = 1
@@ -46,11 +46,11 @@ def generateAllNonProjectivePlanarGraphs(output=False, keepWork=False):
             t1 = time()
             print "Loop has run " + str(counter) + " times in " + str(t1-t0) + " time"
             if keepWork:
-                file = open(dirInput + "list-" + str(counter % 1000), "w")
+                listFile = open(dirInput + "list-" + str(counter % 1000), "w")
                 for i in range(len(listCurrGraphs)):
                     inputGraph = listCurrGraphs[i]
-                    file.write("Graph " + str(i) + "\n" + inputGraph.toFileString() + "\n\n")
-                file.close()
+                    listFile.write("Graph " + str(i) + "\n" + inputGraph.toFileString() + "\n\n")
+                listFile.close()
 #                fileNumber += 1
                 print "file created!"
                 print dirOutput + "list-" + str(counter % 1000)
@@ -69,16 +69,16 @@ def generateAllNonProjectivePlanarGraphs(output=False, keepWork=False):
         
         if not currGraphObstructions:
             currGraphLabel = currGraph.getCanonicalLabel()
-            for nppgLabel in lisNPPGLabels:
+            for nppgLabel in listNPPGLabels:
                 if nppgLabel == currGraphLabel:
                     break
             else:
-                lisNPPGLabels.append(currGraphLabel)
+                listNPPGLabels.append(currGraphLabel)
 
                 if output:
-                    file = open(dirOutput + "graph-" + str(fileNumber), "w")
-                    file.write(currGraph.toFileString())
-                    file.close()
+                    outputFile = open(dirOutput + "graph-" + str(fileNumber), "w")
+                    outputFile.write(currGraph.toFileString())
+                    outputFile.close()
                     print "file created!:     " + dirOutput + "graph-" + str(fileNumber)
                     fileNumber += 1
 
@@ -92,6 +92,9 @@ def generateAllNonProjectivePlanarGraphs(output=False, keepWork=False):
                 else:
                     listCurrGraphs.append(currGraphObstruction)
                     listCurrGraphsLabels.append(currGraphObstruction.getCanonicalLabel())
+    labelsFile = open(dirOutput + "labels-" + str(len(listNPPGLabels)), "w")
+    labelsFile.write(str(listNPPGLabels))
+    labelsFile.close()
 
 
 
