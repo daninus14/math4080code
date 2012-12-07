@@ -1,17 +1,126 @@
+import pdb
 from graphFunctions import *
 from stage2Functions import *
 from stage1 import *
 from stage2 import *
 from GraphWithV8 import *
+from GraphMinor import *
+import embeddingtest
 from time import time
+import cPickle as pickle 
 import os
+# import gc # garbage collector
 __author__="Daniel Nussenbaum"
 __date__ ="$Feb 29, 2012 11:15:32 AM$"
-__all__ = ["generateAllNonProjectivePlanarGraphs"]
+__all__ = ["generateAllNonProjectivePlanarGraphs", "findMinorMinimalGraphs", "show_prev_results"]
 
 ## STAGE 3 ALGORITHMS
 
-def generateAllNonProjectivePlanarGraphs(output=False, keepWork=False):
+def show_prev_results(filepath):
+    labels = pickle.load( open( filepath, "rb" ) )
+    new_labels = []
+    for label in labels:
+        g = GraphMinor.from_sage_graph_label(label)
+        if g.getCanonicalLabel() not in new_labels:
+            new_labels.append(g.getCanonicalLabel())
+    for label in new_labels:
+        g = GraphMinor.from_sage_graph_label(label)
+        print g.to_pretty_string()
+        print "\n"
+
+def findMinorMinimalGraphs(from_scratch=True):
+    dirOutput = os.getcwd()
+    folders = dirOutput.split('/')
+    dirOutput = dirOutput.strip(folders[-1])
+    dirOutput = dirOutput + "output/"
+    # filename = "labels-8262"
+    filename = "non-embedable-labels-57204"
+    if from_scratch:
+        labels = generateAllNonProjectivePlanarGraphs()
+    else:
+        labels = pickle.load( open( dirOutput + filename, "rb" ) )
+    
+    [new_labels, new_non_embedding] = get_minor_minimal_from_list(labels)
+    # pdb.set_trace()
+    # while len(new_non_embedding) > 0:
+    # for i in range(1):
+    #     [temp_new_labels, temp_new_non_embedding] = get_minor_minimal_from_list(new_non_embedding)
+    #     new_labels += temp_new_labels
+    #     new_non_embedding = temp_new_non_embedding
+    #     for label in new_non_embedding:
+    #         if label in new_labels:
+    #             new_non_embedding.remove(label)
+
+    new_labels = list(set(new_labels))
+
+    pickle.dump( new_labels, open( dirOutput + "minor-minimal-labels-" + str(len(new_labels)), "wb" ) )
+    pickle.dump( new_non_embedding, open( dirOutput + "non-embedable-labels-" + str(len(new_non_embedding)), "wb" ) )
+
+
+def get_minor_minimal_from_list(labels):
+    new_labels = []
+    # non_embedable_dic = {label: False for label in labels}
+    embed_problems_list = []
+    t0 = time()
+    counter = 0
+    all_counter = 0
+    new_non_embedding = []
+    
+    for label in labels:
+        # not_valid = False
+        all_embed = True
+        curr_graph = GraphMinor.from_sage_graph_label(label)
+        list_edge_contracted_removed = curr_graph.get_list_of_minors() + curr_graph.get_list_of_1_edge_removed()
+        # del curr_graph
+        # gc.collect()
+        # print "now analyzing label " + label + "\n"
+        for temp_graph in list_edge_contracted_removed:
+            # t1 = time()
+            # print "t1: " + str(t1-t0)
+            # print "current temp_graph ", temp_graph
+            # print "temp_graph: ", temp_graph.getCanonicalLabel()
+            # if temp_graph.getCanonicalLabel() in non_embedable_dic:
+            #     break
+            embed_status = embeddingtest.graph_embeds(temp_graph.get_gembed_format())
+            if embed_status == False:
+                # non_embedable_dic[temp_graph.getCanonicalLabel()] = False
+                curr_new_label = temp_graph.getCanonicalLabel()
+                if curr_new_label not in labels and curr_new_label not in new_non_embedding:
+                    new_non_embedding.append(curr_new_label)
+                # break
+                # not_valid = True
+                all_embed = False
+            elif embed_status == None:
+                embed_problems_list.append(temp_graph.getCanonicalLabel())
+                pdb.set_trace()
+        # else:
+            # new_labels.append(label)
+            # counter += 1
+
+        # if not not_valid:
+        if all_embed:
+            new_labels.append(label)
+            counter += 1
+
+        all_counter += 1    
+
+    t1 = time()    
+    print all_counter, "labels analyzed in t1: " + str(t1-t0)
+    print counter, " labels have been added to the list"
+    return [new_labels, list(set(new_non_embedding))]
+    # if len(new_non_embedding) > 0: 
+    #     recurse_labels = get_minor_minimal_from_list(list(set(new_non_embedding)))
+    #     t1 = time()    
+    #     print all_counter, "labels analyzed in t1: " + str(t1-t0)
+    #     print counter, " labels have been added to the list"
+    #     return list(set(new_labels + recurse_labels))
+    # else: 
+    #     t1 = time()    
+    #     print all_counter, "labels analyzed in t1: " + str(t1-t0)
+    #     print counter, " labels have been added to the list"
+    #     return new_labels
+
+def generateAllNonProjectivePlanarGraphs(output=False, keepWork=False, labels=True):
     v8 = GraphWithV8.fromfilename() # This is the original V8 graph we start with
     listCurrGraphs = [v8] # This is a list of graphs
     listCurrGraphsLabels = [] # This is a list of the canonical labels of the curent graphs
@@ -19,13 +128,16 @@ def generateAllNonProjectivePlanarGraphs(output=False, keepWork=False):
 #    noEmbedList = []
 
     fileNumber = 1
-    if output:
+    if output or labels:
         dirOutput = os.getcwd()
         folders = dirOutput.split('/')
         dirOutput = dirOutput.strip(folders[-1])
         if not os.path.exists(dirOutput + "output/"):
             os.makedirs(dirOutput + "output/")
+        if not os.path.exists(dirOutput + "output/" + "graphs/"):
+            os.makedirs(dirOutput + "output/" + "graphs/")
         dirOutput = dirOutput + "output/"
+        dirOutputGraphs = dirOutput + "graphs/"
     if keepWork:
         dirInput = os.getcwd()
         foldersInput = dirInput.split('/')
@@ -76,10 +188,10 @@ def generateAllNonProjectivePlanarGraphs(output=False, keepWork=False):
                 listNPPGLabels.append(currGraphLabel)
 
                 if output:
-                    outputFile = open(dirOutput + "graph-" + str(fileNumber), "w")
+                    outputFile = open(dirOutputGraphs + "graph-" + str(fileNumber), "w")
                     outputFile.write(currGraph.toFileString())
                     outputFile.close()
-                    print "file created!:     " + dirOutput + "graph-" + str(fileNumber)
+                    print "file created!:     " + dirOutputGraphs + "graph-" + str(fileNumber)
                     fileNumber += 1
 
         else:
@@ -92,10 +204,13 @@ def generateAllNonProjectivePlanarGraphs(output=False, keepWork=False):
                 else:
                     listCurrGraphs.append(currGraphObstruction)
                     listCurrGraphsLabels.append(currGraphObstruction.getCanonicalLabel())
-    labelsFile = open(dirOutput + "labels-" + str(len(listNPPGLabels)), "w")
-    labelsFile.write(str(listNPPGLabels))
-    labelsFile.close()
+    # labelsFile = open(dirOutput + "labels-" + str(len(listNPPGLabels)), "w")
+    # labelsFile.write(str(listNPPGLabels))
+    # labelsFile.close()
+    if labels:
+        pickle.dump( listNPPGLabels, open( dirOutput + "labels-" + str(len(listNPPGLabels)), "wb" ) )
 
+    return listNPPGLabels
 
 
 def getGraphListWithObstructions(graph):

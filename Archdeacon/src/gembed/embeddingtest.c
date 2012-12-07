@@ -2,57 +2,6 @@
 #include "graph.h"
 #define maxverts 30
 
-static PyObject* hello(PyObject* self, PyObject* args)
-{
-	const char* name;
-
-	if(!PyArg_ParseTuple(args, "s", &name))
-		return NULL;
-
-	printf("Hello %s!\n", name);
-
-	Py_RETURN_NONE;
-}
-
-static PyObject* tpp(PyObject* self, PyObject* args)
-{
-	PyObject* obj;
-    PyObject* seq;
-    int i, len; 
-    PyObject* item;
-    long arrayValue;
-
-    if (!PyArg_ParseTuple(args, "O", &obj)){
-        printf("Item is not a list\n");
-        return NULL;
-    }
-    seq = PySequence_Fast(obj, "expected a sequence");
-    len = PySequence_Size(obj);
-    arrayValue = -5;
-    printf("[\n");
-    for (i = 0; i < len; i++) {
-        item = PySequence_Fast_GET_ITEM(seq, i);
-
-        PyObject* objectsRepresentation = PyObject_Repr(item);
-        const char* s = PyString_AsString(objectsRepresentation);
-        printf("%s\n", s);
-
-
-        PyObject* objType = PyObject_Type(item);
-        PyObject* objTypeString = PyObject_Repr(objType);
-        const char* sType = PyString_AsString(objTypeString);
-        printf("%s\n", sType);
-
-        arrayValue = PyInt_AsLong(item);
-        printf("Finally, a long: %d\n", arrayValue);
-
-    }
-    Py_DECREF(seq);
-    printf("]\n");
-	printf("Item is a list!\n");
-
-	Py_RETURN_NONE;
-}
 
 static PyObject* graph_embeds(PyObject* self, PyObject* args)
 {
@@ -60,7 +9,7 @@ static PyObject* graph_embeds(PyObject* self, PyObject* args)
     // Making Graphs
     vertex u, v; unsigned temp;
     graph (g);
-    int gem;
+    int gem, countVerteicesProcessed = 0;
     // vertex i, j, u, v; unsigned temp;
     // Finish making graphs
     PyObject* obj;
@@ -74,12 +23,13 @@ static PyObject* graph_embeds(PyObject* self, PyObject* args)
 
     if (!PyArg_ParseTuple(args, "O", &obj)){
         printf("Item is not a list\n");
-        return NULL;
+        // return NULL;
+        Py_RETURN_NONE;
     }
     seq = PySequence_Fast(obj, "expected a sequence");
     len = PySequence_Size(obj);
     arrayValue = -5;
-    printf("[\n");
+    // printf("[\n");
     for (i = 0; i < len; i++) {
         item = PySequence_Fast_GET_ITEM(seq, i);
 
@@ -88,12 +38,14 @@ static PyObject* graph_embeds(PyObject* self, PyObject* args)
         if(i == 0){
             // should add a check to make sure it is an integer!
             numberOfVertices = PyInt_AsLong(item);   
-            printf("numberOfVertices: %d\n", numberOfVertices);
+            // printf("numberOfVertices: %d\n", numberOfVertices);
             // graph creation
-            if ((**g = (char) numberOfVertices) > maxverts - 2) return 2;
+            if ((**g = (char) numberOfVertices) > maxverts - 2) Py_RETURN_NONE;
+            // if ((**g = (char) numberOfVertices) > maxverts - 2) return 2;
             // end graph creation
         } else if(i <= numberOfVertices && i > 0){
             // should add a check to make sure it is a list!
+            countVerteicesProcessed++;
             PyObject* obj_adjacency = item;
             PyObject* seq_adjacency;
             int j = 0, len_adjacency; 
@@ -109,7 +61,8 @@ static PyObject* graph_embeds(PyObject* self, PyObject* args)
             }
             int adjacent[degreeOfVertex];
             // graph creation
-            if ((degree (g, i) = (char) degreeOfVertex) > maxdeg - 2) return 4;
+            if ((degree (g, i) = (char) degreeOfVertex) > maxdeg - 2) Py_RETURN_NONE;
+            // if ((degree (g, i) = (char) degreeOfVertex) > maxdeg - 2) return 4;
             // end graph creation
             for (j = 1; j < len_adjacency; j++) {
                 item_adjacency = PySequence_Fast_GET_ITEM(seq_adjacency, j);
@@ -117,17 +70,17 @@ static PyObject* graph_embeds(PyObject* self, PyObject* args)
                 // delete this code!
                 PyObject* objectsRepresentation = PyObject_Repr(item);
                 const char* s = PyString_AsString(objectsRepresentation);
-                printf("%s\n", s);
+                // printf("%s\n", s);
                 PyObject* objType = PyObject_Type(item);
                 PyObject* objTypeString = PyObject_Repr(objType);
                 const char* sType = PyString_AsString(objTypeString);
-                printf("%s\n", sType);
+                // printf("%s\n", sType);
                 // end delete
 
 
                 // make sure every object is an int!
                 adjacent[j-1] = PyInt_AsLong(item_adjacency);
-                printf("%da\n", adjacent[j-1]);
+                // printf("%da\n", adjacent[j-1]);
                 // make sure first int is the degree and is the same as the length -1 of the array
 
                 // graph creation
@@ -149,39 +102,60 @@ static PyObject* graph_embeds(PyObject* self, PyObject* args)
 
     }
 
-    printf("loop is done!\n");
+    if(countVerteicesProcessed < numberOfVertices) Py_RETURN_NONE;
+
+    vertex j;
+    // vertex i, j, u, v; unsigned temp;
+    for (i = 1; i <= **g; i++) for (j = 1; j <= degree(g, i); j++){
+            // if (g [i][j] > **g) return 6; //this checks that the label of each vertex in the respective adjacency lists
+            if (g [i][j] > **g) Py_RETURN_NONE; 
+            // do not exceed the number of vertices in the graph as listed in the file.
+            for (u = g [i][j], v = 1; (v <= degree(g, u)) && (g[u][v] != i); v ++); //this loops through all the vertices
+             // adjacent to u and stops whenever it finds the vertex i, or it finishes the list
+            // if (v > degree(g, u)) return 7; // if v is greater than the degree, it means vertex i was not found in the 
+            if (v > degree(g, u)) Py_RETURN_NONE; 
+             // adjacency list for u, meaning the graph is directed. It seems directed graphs are not acceptable!
+    }
+
+    
+
+    // printf("loop is done!\n");
 
     char s = 'p';
     gem = gembed (g, s, 1);
-    printf("gembed is done!\n");
+    // printf("gembed is done!\n");
 /*  system ("date"); */
     switch (gem) {
-        case 0: printf ( "no ");
-            switch (s) {
-                case 'p' : printf ("projective"); break;
-                case 't' : printf ("toroidal"); break;
-                case 's' : printf ("spindle"); break;
-                default  : printf ("ERROR"); 
-                }
-            puts (" embeddings");
+        case 0: 
+            // printf ( "no ");
+            // switch (s) {
+            //     case 'p' : printf ("projective"); break;
+            //     case 't' : printf ("toroidal"); break;
+            //     case 's' : printf ("spindle"); break;
+            //     default  : printf ("ERROR"); 
+            //     }
+            // puts (" embeddings");
             embedsBoolean = 0;
             break;
-        case 2: puts ( "graph is planar");
+        case 2: 
+            // puts ( "graph is planar");
             embedsBoolean = 1;
             break;
         case 1:
-        case 3: puts ( "graph embeds"); 
+        case 3: 
+            // puts ( "graph embeds"); 
             embedsBoolean = 1;
             break;
         default: puts ( "whoops -- unknown result from gembed()");
+            Py_RETURN_NONE;
             break;
     }
 
 
 
     Py_DECREF(seq);
-    printf("]\n");
-    printf("Item is a list!\n");
+    // printf("]\n");
+    // printf("Item is a list!\n");
 
     if(embedsBoolean) Py_RETURN_TRUE;
     else Py_RETURN_FALSE;
@@ -191,8 +165,8 @@ static PyObject* graph_embeds(PyObject* self, PyObject* args)
 
 static PyMethodDef EmbedtestMethods[] = 
 {
-    {"tpp", tpp, METH_VARARGS, "Test whether a given graph is projective planar"},
-    {"hello", hello, METH_VARARGS, "Test whether a given graph is projective planar"},
+    // {"tpp", tpp, METH_VARARGS, "Test whether a given graph is projective planar"},
+    // {"hello", hello, METH_VARARGS, "Test whether a given graph is projective planar"},
 	{"graph_embeds", graph_embeds, METH_VARARGS, "Test whether a given graph is projective planar"},
 	{NULL, NULL, 0, NULL}
 };

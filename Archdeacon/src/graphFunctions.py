@@ -1,3 +1,4 @@
+from copy import deepcopy
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
 
@@ -8,7 +9,8 @@ __all__ = ["replaceEdgesWithPaths",
             "createEdgeList", "createGraph", "graphsEqual", "addPathToGraph", "cycleDFS", "extractCycle",
             "cloneList", "getVertices", "getVerticesInOrder", "getEdgeTuples", "getPath", "getGraphFromEdgeTupleList",
             "getGraphFromVerticesInOrder", "getV8", "createFaces", "joinGraphs", "createEmbeddings", "findNewKey",
-            "checkGraphIsomorphism", "graphIsomorphism", "cloneListOfLists", "sortByUniqueness"]
+            "checkGraphIsomorphism", "graphIsomorphism", "cloneListOfLists", "sortByUniqueness", "get_graph_contract_edge",
+            "relabel_edge_list"]
 
 def checkGraphIsomorphism(graph0, graph1):
     keys0 = []
@@ -486,6 +488,34 @@ def joinGraphs(graph1, graph2):
         
     
     return newGraph
+
+def get_graph_contract_edge(edge_list, edge):
+    # print "hello"
+    min_v = min(edge)
+    temp_edge_list = deepcopy(edge_list)
+    temp_edge_list.remove(edge)
+    new_edge_list = []
+    for e in temp_edge_list:
+        if e[0] in edge:
+            if (min_v, e[1]) not in new_edge_list:
+                new_edge_list.append((min_v, e[1]))
+        elif e[1] in edge:
+            if (min_v, e[0]) not in new_edge_list:
+                new_edge_list.append((min_v, e[0]))
+        else:
+            new_edge_list.append(e)
+    return relabel_edge_list(new_edge_list)
+
+def relabel_edge_list(edge_list):
+    graph_dic = getGraphFromEdgeTupleList(edge_list)
+    num_vertices = len(graph_dic.keys())
+    translate_dic = {}
+    counter = 1
+    for k,v in graph_dic.iteritems():
+        translate_dic[k] = counter
+        counter += 1
+
+    return [num_vertices,[(translate_dic[x], translate_dic[y]) for (x,y) in edge_list]]
 
 #NEED TO CODE THIS!
 def getV8(original, mapping):

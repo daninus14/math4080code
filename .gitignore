@@ -71,3 +71,9 @@ pip-log.txt
 # Folders #
 ###########
 Archdeacon/output/
+Archdeacon/input/
+Archdeacon/Archive/
+
+# Other #
+#########
+*.ps

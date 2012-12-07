@@ -1,4 +1,4 @@
-# from archdeacon import *
+from archdeacon import *
 from time import time
 import os
 import et
@@ -15,6 +15,9 @@ def main():
     t0 = time()
     if len(sys.argv) == 1 or sys.argv[1] == "--help":
         print "Help (winter) is coming...." 
+        print "options include"
+        print "\t-et which takes 3 arguments and tests embedding"
+        print "\t-gNPP which generates Non-Projective Planar (gNPP) graphs with options -output and -keepWork"
     elif sys.argv[1] == "-et":
         et(sys.argv[2], sys.argv[3], sys.argv[4])
     elif sys.argv[1] == '-gNPP': #Generate Non-Projective Planar (gNPP) graphs
@@ -30,6 +33,12 @@ def main():
     elif sys.argv[1] == '-test':
         if sys.argv[2] == '-gNPP':
             print 'FIGURE OUT HOW TO CALL A TEST!'
+    elif sys.argv[1] == "-fMMG":
+        findMinorMinimalGraphs()
+    elif sys.argv[1] == "-fMMGf":
+        findMinorMinimalGraphs(False)
+    elif sys.argv[1] == '--results':
+        show_prev_results(sys.argv[2])
     else: print sys.argv
     t1 = time()
     print "Total Time: " + str(t1-t0)
@@ -37,6 +46,6 @@ def main():
 ## STAGE 3 ALGORITHMS
 if __name__ == "__main__":
     import sys
-    # main()
-    testing_et()
+    main()
+    # testing_et()
 
