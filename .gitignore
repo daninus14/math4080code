@@ -70,9 +70,10 @@ pip-log.txt
 
 # Folders #
 ###########
-Archdeacon/output/
-Archdeacon/input/
-Archdeacon/Archive/
+gnppg/output/
+gnppg/input/
+gnppg/Archive/
+archdeacon-graphs/
 
 # Other #
 #########
